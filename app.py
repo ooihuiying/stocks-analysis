@@ -3,20 +3,7 @@ import yfinance as yf
 import pandas as pd
 import pandas_ta as ta
 from tab1 import show_big_picture_trend
-
-def show_oscillators(data):
-    """Displays common oscillator charts like RSI and MACD."""
-    st.header("2. Oscillators")
-
-    # Relative Strength Index (RSI)
-    st.subheader("Relative Strength Index (RSI)")
-    data['RSI'] = ta.rsi(data['Close'], length=14)
-    st.line_chart(data['RSI'])
-    
-    # Moving Average Convergence Divergence (MACD)
-    st.subheader("Moving Average Convergence Divergence (MACD)")
-    macd = ta.macd(data['Close'])
-    st.area_chart(macd[['MACD_12_26_9', 'MACDs_12_26_9']])
+from tab2 import show_oscillators
 
 def show_price_action_and_confirmation(data):
     # TODO: Add pattern detection like Head and Shoulders, Double Tops/Bottoms

@@ -4,11 +4,11 @@ import pandas as pd
 import pandas_ta as ta
 
 def simple_volume_analysis(data):
-    # 1. Volume Data
+    # Volume Data
     st.subheader("Volume Data for Confirmation")
     st.bar_chart(data['Volume'])
     # Get the latest volume compare with the latest average volume
-    data['Volume_SMA'] = ta.sma(data['Volume'], length=20) #20 period SMA
+    data['Volume_SMA'] = ta.sma(data['Volume'], length=20) # 20-day period SMA
     latest_volume = data['Volume'].iloc[-1]
     latest_volume_sma = data['Volume_SMA'].iloc[-1]
     if latest_volume > 2 * latest_volume_sma:
@@ -19,7 +19,6 @@ def simple_volume_analysis(data):
         st.error("📉 **Below Average Volume**: The current volume is below the 20-day average. This indicates a lack of significant interest.")
 
 def on_balance_volume(data):
-    # 2. Volume in detail
     st.subheader("On-Balance Volume (OBV)")
     data['OBV'] = ta.obv(data['Close'], data['Volume'])
     st.line_chart(data['OBV'])
@@ -28,12 +27,15 @@ def on_balance_volume(data):
     obv_10_days_ago = data['OBV'].iloc[-10]
 
     if obv_current > obv_10_days_ago:
-        st.info("📈 **Rising OBV**: The OBV is trending up. This indicates buying pressure and confirms the current uptrend.")
+        st.success("📈 **Rising OBV**: The OBV is trending up. This indicates buying pressure and confirms the current uptrend.")
+    elif obv_current:
+        st.error("📉 **Falling OBV**: The OBV is trending down. This indicates selling pressure and confirms the current downtrend.")
     else:
-        st.info("📉 **Falling OBV**: The OBV is trending down. This indicates selling pressure and confirms the current downtrend.")
+        st.info("⚖️ **Flat OBV**: The OBV is relatively flat. This indicates a lack of conviction in either direction.")
 
-    # b. Check for Bullish and Bearish Divergence
+    # Check for Bullish and Bearish Divergence
     # Look for divergence over the last 30 trading days
+    st.info("Checking for Bullish/Bearish Divergence between Price and OBV. Used for confirmation of potential reversals. 30 days lookback.")
     lookback_period = 30
     recent_data = data.tail(lookback_period)
     
@@ -51,8 +53,7 @@ def on_balance_volume(data):
     # Bullish Divergence check (Price lower low, OBV higher low)
     if (second_half.loc[second_half_low_idx]['Close'] < first_half.loc[first_half_low_idx]['Close']) and \
        (second_half.loc[second_half_low_idx]['OBV'] > first_half.loc[first_half_low_idx]['OBV']):
-        st.success("📊 **Bullish Divergence Detected**: The price is making a lower low, but the OBV is making a higher low. This suggests a potential reversal to the upside.")
-
+        st.success("📊 **Bullish Divergence Detected**: The price is making a lower low, but the OBV is making a higher low (more buying than selling). This suggests a potential reversal to the upside.")
     # Bearish Divergence check (Price higher high, OBV lower high)
     elif (second_half.loc[second_half_high_idx]['Close'] > first_half.loc[first_half_high_idx]['Close']) and \
          (second_half.loc[second_half_high_idx]['OBV'] < first_half.loc[first_half_high_idx]['OBV']):
@@ -60,25 +61,8 @@ def on_balance_volume(data):
     else:
         st.info("No bullish or bearish divergence detected.")
     
-def show_price_action_and_confirmation(data):
-    # TODO: Add pattern detection like Head and Shoulders, Double Tops/Bottoms
-    # Reversal vs Continuation patterns
-    # https://github.com/neurotrader888/TechnicalAnalysisAutomation
-    """Displays charts for price action confirmation like Volume and Bollinger Bands."""
-    st.header("3. Price Action & Confirmation")
+def show_volume_confirmation_charts(data):
+    """Displays charts for volume to confirm price action."""
+    st.header("3. Volume Confirmation")
     simple_volume_analysis(data)
     on_balance_volume(data)
-    # Bollinger Bands (with check for enough data)
-    st.subheader("Bollinger Bands")
-    if len(data) >= 20:
-        bbands = ta.bbands(data['Close'])
-        data = pd.concat([data, bbands], axis=1)
-        chart_data = data[['Close', 'BBL_20_2.0', 'BBM_20_2.0', 'BBU_20_2.0']].copy()
-        st.line_chart(chart_data)
-    else:
-        st.warning("Not enough data points to plot Bollinger Bands (at least 20 required).")
-    
-    # Average Directional Index (ADX)
-    st.subheader("Average Directional Index (ADX)")
-    adx = ta.adx(data['High'], data['Low'], data['Close'])
-    st.line_chart(adx)

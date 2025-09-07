@@ -4,7 +4,8 @@ import pandas as pd
 import pandas_ta as ta
 from tab1 import show_big_picture_trend
 from tab2 import show_oscillators
-from tab3 import show_price_action_and_confirmation
+from tab3 import show_volume_confirmation_charts
+from tab4 import show_reversal_continuation_patterns
 
 def show_news(ticker):
     """Fetches and displays recent news for the given ticker."""
@@ -52,11 +53,12 @@ if ticker:
         if not data.empty and len(data) > 1:   
             
             # Create tabs and call the functions to render their content
-            tab1, tab2, tab3, tab4 = st.tabs([
+            tab1, tab2, tab3, tab4, tab5 = st.tabs([
                 "Big Picture Trend", 
-                "Oscillators", 
-                "Price Action & Confirmation", 
-                "News"
+                "Oscillators to check Momentum", 
+                "Volume to confirm Price Action",
+                "Reversals & Continuations patterns to catch overbought/oversold", 
+                "News & Sentiment"
             ])
 
             with tab1:
@@ -66,9 +68,13 @@ if ticker:
                 show_oscillators(data)
                 
             with tab3:
-                show_price_action_and_confirmation(data)
-                
+                show_volume_confirmation_charts(data)
             with tab4:
+                # TODO: Add pattern detection like Head and Shoulders, Double Tops/Bottoms
+                # Reversal vs Continuation patterns
+                # https://github.com/neurotrader888/TechnicalAnalysisAutomation
+                show_reversal_continuation_patterns(data)
+            with tab5:
                 show_news(ticker)
 
         else:

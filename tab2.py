@@ -3,20 +3,15 @@ import yfinance as yf
 import pandas as pd
 import pandas_ta as ta
 
-def show_oscillators(data):
-    """Displays common oscillator charts with improved visuals."""
-    st.header("2. Oscillators")
-    st.info("Strong Buy Signal: Occurs when the RSI is moving out of the oversold region (e.g., crossing above 30) and the MACD has a bullish crossover (MACD line crosses above the signal line) with green histogram bars. This provides strong confirmation of a potential upward trend.")
-    st.info("Strong Sell Signal: Occurs when the RSI is moving out of the overbought region (e.g., dropping below 70) and the MACD has a bearish crossover (MACD line crosses below the signal line) with red histogram bars. This suggests a likely downward trend.")
-    
-    # 1. Relative Strength Index (RSI)
+def rsi(data):
     st.subheader("Relative Strength Index (RSI)")
     st.write("RSI values above 70 indicate overbought conditions, while values below 30 indicate oversold conditions.")
     st.write("Ideal RSI range for trading is between 30 and 70.")
     st.info("In an uptrend, buy dips when RSI is 30-40; in a downtrend, sell rallies when RSI is 60-70.")
     data['RSI'] = ta.rsi(data['Close'], length=14)
     st.line_chart(data['RSI'])
-    
+
+def macd(data):
     # 2. Moving Average Convergence Divergence (MACD)
     st.subheader("Moving Average Convergence Divergence (MACD)")
     # Ensure the MACD calculation is correct
@@ -49,10 +44,12 @@ def show_oscillators(data):
     # 2b. MACD Line and Signal Line Chart
     st.info("MACD Line Crossover: The MACD line crosses above the signal line. This is the primary signal for an increase in upward momentum.")
     st.line_chart(macd_data[['MACD', 'Signal Line']])
+    return macd_data
 
+def compare_rsi_and_macd_signals(data, macd_data):
     # 3. Check for and display signals
     # Define the grace period in days
-    grace_period = 3
+    grace_period = 10
 
     # Check for RSI bullish signal within the grace period
     rsi_bullish_crossover_events = (data['RSI'].shift(1) <= 30) & (data['RSI'] > 30)
@@ -74,6 +71,17 @@ def show_oscillators(data):
     if rsi_bullish_signal and macd_bullish_signal:
         st.success("✅ **Strong Buy Signal**: Both RSI and MACD have shown a bullish crossover within the last 3 days. This suggests a potential upward trend.")
     elif rsi_bearish_signal and macd_bearish_signal:
-        st.success("❌ **Strong Sell Signal**: Both RSI and MACD have shown a bearish crossover within the last 3 days. This suggests a potential downward trend.")
+        st.error("❌ **Strong Sell Signal**: Both RSI and MACD have shown a bearish crossover within the last 3 days. This suggests a potential downward trend.")
     else:
-        st.success("No strong buy or sell signal detected based on the current data.")
+        st.error("No strong buy or sell signal detected based on the current data.")
+
+def show_oscillators(data):
+    """Displays common oscillator charts with improved visuals."""
+    st.header("2. Oscillators")
+    st.info("Strong Buy Signal: Occurs when the RSI is moving out of the oversold region (e.g., crossing above 30) and the MACD has a bullish crossover (MACD line crosses above the signal line) with green histogram bars. This provides strong confirmation of a potential upward trend.")
+    st.info("Strong Sell Signal: Occurs when the RSI is moving out of the overbought region (e.g., dropping below 70) and the MACD has a bearish crossover (MACD line crosses below the signal line) with red histogram bars. This suggests a likely downward trend.")
+    
+    rsi(data)
+    macd_data = macd(data)
+    compare_rsi_and_macd_signals(data, macd_data)
+    

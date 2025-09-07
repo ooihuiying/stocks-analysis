@@ -4,32 +4,7 @@ import pandas as pd
 import pandas_ta as ta
 from tab1 import show_big_picture_trend
 from tab2 import show_oscillators
-
-def show_price_action_and_confirmation(data):
-    # TODO: Add pattern detection like Head and Shoulders, Double Tops/Bottoms
-    # Reversal vs Continuation patterns
-    # https://github.com/neurotrader888/TechnicalAnalysisAutomation
-    """Displays charts for price action confirmation like Volume and Bollinger Bands."""
-    st.header("3. Price Action & Confirmation")
-    
-    # Volume Data
-    st.subheader("Volume Data for Confirmation")
-    st.bar_chart(data['Volume'])
-    
-    # Bollinger Bands (with check for enough data)
-    st.subheader("Bollinger Bands")
-    if len(data) >= 20:
-        bbands = ta.bbands(data['Close'])
-        data = pd.concat([data, bbands], axis=1)
-        chart_data = data[['Close', 'BBL_20_2.0', 'BBM_20_2.0', 'BBU_20_2.0']].copy()
-        st.line_chart(chart_data)
-    else:
-        st.warning("Not enough data points to plot Bollinger Bands (at least 20 required).")
-    
-    # Average Directional Index (ADX)
-    st.subheader("Average Directional Index (ADX)")
-    adx = ta.adx(data['High'], data['Low'], data['Close'])
-    st.line_chart(adx)
+from tab3 import show_price_action_and_confirmation
 
 def show_news(ticker):
     """Fetches and displays recent news for the given ticker."""

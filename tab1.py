@@ -151,7 +151,7 @@ def plot_support_resistance(data: pd.DataFrame):
         lookback (int): The number of data points to use for trendline calculation.
     """
     st.subheader("Plotting Trendlines")  
-    candles = data
+    candles = data.copy()  # Work on a copy of the data
 
     # Take natural log of data to resolve price scaling issues
     candles['High'] = np.log(candles['High'])
@@ -265,6 +265,6 @@ def show_big_picture_trend(data):
     """Displays the main price chart and a basic trend analysis."""
     st.header("1. Big Picture: Market Context")
     st.write("Refer to TradingView's Lux Algo for a comprehensive resistance and support analysis.")
-    plot_support_resistance(data)
     plot_basic_trend(data)
+    plot_support_resistance(data)
     plot_moving_averages(data)

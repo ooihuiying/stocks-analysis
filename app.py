@@ -113,4 +113,4 @@ if ticker:
             st.warning("No data found for the selected ticker and period. Please try a different ticker or time period.")
 
     except Exception as e:
-        st.error(f"An error occurred: {e}")
+        print(f"An error occurred: {e}")

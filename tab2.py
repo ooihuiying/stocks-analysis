@@ -51,18 +51,29 @@ def show_oscillators(data):
     st.line_chart(macd_data[['MACD', 'Signal Line']])
 
     # 3. Check for and display signals
-    current_rsi = data['RSI'].iloc[-1]
-    last_two_rsi = data['RSI'].iloc[-2:]
+    # Define the grace period in days
+    grace_period = 3
+
+    # Check for RSI bullish signal within the grace period
+    rsi_bullish_crossover_events = (data['RSI'].shift(1) <= 30) & (data['RSI'] > 30)
+    rsi_bullish_signal = rsi_bullish_crossover_events.tail(grace_period).any()
+
+    # Check for MACD bullish signal within the grace period
+    macd_bullish_crossover_events = (macd_data['MACD'].shift(1) <= macd_data['Signal Line'].shift(1)) & (macd_data['MACD'] > macd_data['Signal Line'])
+    macd_bullish_signal = macd_bullish_crossover_events.tail(grace_period).any()
     
-    macd_crossover = macd_data['MACD'].iloc[-1] > macd_data['Signal Line'].iloc[-1] and macd_data['MACD'].iloc[-2] <= macd_data['Signal Line'].iloc[-2]
+    # Check for RSI bearish signal within the grace period
+    rsi_bearish_crossover_events = (data['RSI'].shift(1) >= 70) & (data['RSI'] < 70)
+    rsi_bearish_signal = rsi_bearish_crossover_events.tail(grace_period).any()
+        
+    # Check for MACD bearish signal within the grace period
+    macd_bearish_crossover_events = (macd_data['MACD'].shift(1) >= macd_data['Signal Line'].shift(1)) & (macd_data['MACD'] < macd_data['Signal Line'])
+    macd_bearish_signal = macd_bearish_crossover_events.tail(grace_period).any()
     
     # Check for strong buy signal
-    if current_rsi > 30 and last_two_rsi.iloc[0] <= 30 and macd_crossover and macd_data['Histogram'].iloc[-1] > 0:
-        st.success("✅ **Strong Buy Signal**: RSI is moving out of the oversold region and MACD has a bullish crossover with a green histogram. This suggests a potential upward trend.")
-
-    # Check for strong sell signal
-    elif current_rsi < 70 and last_two_rsi.iloc[0] >= 70 and not macd_crossover and macd_data['Histogram'].iloc[-1] < 0:
-        st.error("❌ **Strong Sell Signal**: RSI is moving out of the overbought region and MACD has a bearish crossover with a red histogram. This suggests a potential downward trend.")
-
+    if rsi_bullish_signal and macd_bullish_signal:
+        st.success("✅ **Strong Buy Signal**: Both RSI and MACD have shown a bullish crossover within the last 3 days. This suggests a potential upward trend.")
+    elif rsi_bearish_signal and macd_bearish_signal:
+        st.success("❌ **Strong Sell Signal**: Both RSI and MACD have shown a bearish crossover within the last 3 days. This suggests a potential downward trend.")
     else:
-        st.info("No strong buy or sell signal detected based on the current data.")
+        st.success("No strong buy or sell signal detected based on the current data.")

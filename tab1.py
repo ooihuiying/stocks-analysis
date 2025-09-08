@@ -2,8 +2,9 @@ import streamlit as st
 import yfinance as yf
 import pandas as pd
 import numpy as np
-# import mplfinance as mpf
+import mplfinance as mpf
 import matplotlib.pyplot as plt
+import math
 
 def check_trend_line(support: bool, pivot: int, slope: float, y: np.array):
     """
@@ -212,9 +213,11 @@ def plot_basic_trend(data):
 
     if last_close > first_close:
         trend = "Uptrend 📈"
+        st.success(f"The long-term trend appears to be a **{trend}**.")    
     else:
         trend = "Downtrend 📉"
-    st.info(f"The long-term trend appears to be a **{trend}**.")
+        st.error(f"The long-term trend appears to be a **{trend}**.")
+   
 
 def plot_moving_averages(data):
     st.subheader("Double Moving Averages")

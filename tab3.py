@@ -5,7 +5,7 @@ import pandas_ta as ta
 
 def simple_volume_analysis(data):
     # Volume Data
-    st.subheader("Volume Data for Confirmation")
+    st.subheader("Simple Volume Data")
     st.bar_chart(data['Volume'])
     # Get the latest volume compare with the latest average volume
     data['Volume_SMA'] = ta.sma(data['Volume'], length=20) # 20-day period SMA
@@ -59,7 +59,7 @@ def on_balance_volume(data):
          (second_half.loc[second_half_high_idx]['OBV'] < first_half.loc[first_half_high_idx]['OBV']):
         st.error("📉 **Bearish Divergence Detected**: The price is making a higher high, but the OBV is making a lower high. This suggests a potential reversal to the downside.")
     else:
-        st.info("No bullish or bearish divergence detected.")
+        st.success("No bullish or bearish divergence detected.")
     
 def show_volume_confirmation_charts(data):
     """Displays charts for volume to confirm price action."""

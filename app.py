@@ -12,11 +12,8 @@ def show_news(ticker):
     st.header("4. Recent News")
     news = yf.Ticker(ticker).news
     if news:
-        for item in news:
-            st.subheader(item['title'])
-            st.write(f"Source: {item['publisher']}")
-            st.write(f"Published: {pd.to_datetime(item['providerPublishTime'], unit='s')}")
-            st.write(f"[Read more]({item['link']})")
+        st.info(news)
+        
     else:
         st.info("No recent news found for this ticker.")
 
@@ -54,10 +51,10 @@ if ticker:
             
             # Create tabs and call the functions to render their content
             tab1, tab2, tab3, tab4, tab5 = st.tabs([
-                "Big Picture Trend", 
-                "Oscillators to check Momentum", 
+                "Big Picture Trend", # check overall trend
+                "Oscillators", # check momentum
                 "Volume to confirm Price Action",
-                "Reversals & Continuations patterns to catch overbought/oversold", 
+                "Reversals & Continuations", 
                 "News & Sentiment"
             ])
 
@@ -70,9 +67,6 @@ if ticker:
             with tab3:
                 show_volume_confirmation_charts(data)
             with tab4:
-                # TODO: Add pattern detection like Head and Shoulders, Double Tops/Bottoms
-                # Reversal vs Continuation patterns
-                # https://github.com/neurotrader888/TechnicalAnalysisAutomation
                 show_reversal_continuation_patterns(data)
             with tab5:
                 show_news(ticker)

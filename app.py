@@ -6,18 +6,7 @@ from tab1 import show_big_picture_trend
 from tab2 import show_oscillators
 from tab3 import show_volume_confirmation_charts
 from tab4 import show_reversal_continuation_patterns
-
-def show_news(ticker):
-    """Fetches and displays recent news for the given ticker."""
-    st.header("4. Recent News")
-    news = yf.Ticker(ticker).news
-    if news:
-        st.info(news)
-        
-    else:
-        st.info("No recent news found for this ticker.")
-
-# --- Main App Logic ---
+from tab5 import show_news_with_sentiment
 
 # User input for the stock ticker and time period
 st.title("Trading Strategy Visualizer")
@@ -69,7 +58,7 @@ if ticker:
             with tab4:
                 show_reversal_continuation_patterns(data)
             with tab5:
-                show_news(ticker)
+                show_news_with_sentiment(ticker)
 
         else:
             st.warning("No data found for the selected ticker and period. Please try a different ticker or time period.")

@@ -7,3 +7,5 @@ matplotlib
 finvader
 nltk
 transformers
+feedparser
+tweepy

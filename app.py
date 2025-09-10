@@ -8,8 +8,28 @@ from tab3 import show_volume_confirmation_charts
 from tab4 import show_reversal_continuation_patterns
 from tab5 import show_news_with_sentiment
 
-# User input for the stock ticker and time period
+# Display latest prices for selected tickers
 st.title("Trading Strategy Visualizer")
+tickers_list = ["AAPL", "GOOG", "MSFT", "AMZN", "NVDA", "META"]
+latest_prices = {}
+
+# Fetch latest price for each ticker
+for t in tickers_list:
+    try:
+        stock = yf.Ticker(t)
+        latest_prices[t] = stock.history(period="1d")['Close'].iloc[-1]
+    except Exception as e:
+        latest_prices[t] = None
+        print(f"Error fetching {t}: {e}")
+
+# Show the latest prices in a nice layout
+st.subheader("Latest Stock Prices")
+cols = st.columns(len(tickers_list))
+for col, t in zip(cols, tickers_list):
+    price = latest_prices[t]
+    col.metric(label=t, value=f"{price:.2f}")
+
+# User input for the stock ticker and time period
 ticker = st.text_input("Enter a stock ticker (e.g., AAPL):", "AAPL")
 period_options = {
     "6 months": "6mo",
@@ -31,17 +51,15 @@ if ticker:
     try:
         data = yf.download(ticker, period=selected_period)
         
-        # Fix: Flatten the column headers to avoid multi-level index issues
+        # Flatten the column headers if needed
         if isinstance(data.columns, pd.MultiIndex):
             data.columns = data.columns.droplevel(1)
 
-        # Check if data is empty before proceeding
-        if not data.empty and len(data) > 1:   
-            
-            # Create tabs and call the functions to render their content
+        if not data.empty and len(data) > 1:
+            # Create tabs
             tab1, tab2, tab3, tab4, tab5 = st.tabs([
-                "Big Picture Trend", # check overall trend
-                "Oscillators", # check momentum
+                "Big Picture Trend", 
+                "Oscillators", 
                 "Volume to confirm Price Action",
                 "Reversals & Continuations", 
                 "News & Sentiment"
@@ -49,19 +67,15 @@ if ticker:
 
             with tab1:
                 show_big_picture_trend(data)
-            
             with tab2:
                 show_oscillators(data)
-                
             with tab3:
                 show_volume_confirmation_charts(data)
             with tab4:
                 show_reversal_continuation_patterns(data)
             with tab5:
                 show_news_with_sentiment(ticker)
-
         else:
             st.warning("No data found for the selected ticker and period. Please try a different ticker or time period.")
-
     except Exception as e:
-        print(f"An error occurred: {e}")
+        st.error(f"An error occurred: {e}")
